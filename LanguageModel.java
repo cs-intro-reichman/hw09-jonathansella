@@ -34,43 +34,45 @@ public class LanguageModel {
     /** Builds a language model from the text in the given file (the corpus). */
 	public void train(String fileName) {
 		// Your code goes here
-        String window = "";
-        In file = new In(fileName);
-        for (int i = 0; i < windowLength; i++)
-            window += file.readChar();
-        while (!file.isEmpty()) {
-            char c = file.readChar();
-            List charDataMap = this.CharDataMap.get(window);
-            if (charDataMap == null) {
-                charDataMap = new List();
-                this.CharDataMap.put(window, charDataMap);
+        In inputFile = new In(fileName);
+        String wholeFileString = "";
+        wholeFileString = inputFile.readAll();
+        for (int i = 0; i + windowLength < wholeFileString.length(); i++) {
+
+            String key = wholeFileString.substring(i, i + windowLength);
+            List value = CharDataMap.get(key);
+            if (value != null) {
+                if (value.indexOf(wholeFileString.charAt(i + windowLength)) != -1) {
+                    value.update(wholeFileString.charAt(i + windowLength));
+
+                } else {
+                    value.addFirst(wholeFileString.charAt(i + windowLength));
+                }
+            } else {
+                CharDataMap.put(key, new List());
+                CharDataMap.get(key).addFirst(wholeFileString.charAt(i + windowLength));
             }
-            charDataMap.update(c);
-            window = (window + c).substring(1);
+            calculateProbabilities(CharDataMap.get(key));
         }
-        for (List probs : CharDataMap.values())
-            calculateProbabilities(probs);
-	}
+
+    }
+
 
     // Computes and sets the probabilities (p and cp fields) of all the
 	// characters in the given list. */
 	public void calculateProbabilities(List probs) {				
 		// Your code goes here
-        int allChars = 0;
+        double generalNumber = 0;
+        double currentIterator = 0;
         for (int i = 0; i < probs.getSize(); i++) {
-            allChars += probs.listIterator(i).current.cp.count;
+            generalNumber += probs.get(i).count;
         }
         for (int i = 0; i < probs.getSize(); i++) {
-            CharData currentChar = probs.listIterator(i).current.cp;
-            CharData previousChar = (i == 0) ? null : probs.listIterator(i - 1).current.cp;
-            currentChar.p = (double) currentChar.count / allChars;
-            if (i == 0) {
-                currentChar.cp = currentChar.p;
-            } else {
-                currentChar.cp = currentChar.p + previousChar.cp;
-            }
+            probs.get(i).p = probs.get(i).count / generalNumber;
+            probs.get(i).cp = currentIterator + probs.get(i).p;
+            currentIterator = probs.get(i).cp;
         }
-	}
+    }
 
 
     // Returns a random character from the given probabilities list.
