@@ -30,23 +30,26 @@ public class List {
     /** GIVE Adds a CharData object with the given character to the beginning of this list. */
     public void addFirst(char chr) {
         // Your code goes here
-        CharData newData = new CharData(chr);
-        Node newNode = new Node(newData, first);
-        first = newNode;
+        CharData newCharData = new CharData(chr);
+        Node newNode = new Node(newCharData, first);
+        this.first = newNode;
         size++;
     }
+    
     
     /** GIVE Textual representation of this list. */
     public String toString() {
         // Your code goes here
+        if (size == 0) {
+            return "()";
+        }
+        String result = "(";
         Node current = first;
-        String str = "(";
         while (current != null) {
-            str += current.cp.toString();
-            str += " ";
+            result += current.toString() + " ";
             current = current.next;
         }
-        return str.substring(0, str.length() - 1) + ")";
+        return result.substring(0, result.length() - 1) + ")";
     }
 
     /** Returns the index of the first CharData object in this list
@@ -55,11 +58,14 @@ public class List {
     public int indexOf(char chr) {
         // Your code goes here
         Node current = first;
-        for (int i = 0; current != null; i++) {
+        int index = 0;
+        while (current != null) {
             if (current.cp.chr == chr) {
-                return i;
+                return index;
+            } else {
+                current = current.next;
+                index++;
             }
-            current = current.next;
         }
         return -1;
     }
