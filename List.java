@@ -30,9 +30,9 @@ public class List {
     /** GIVE Adds a CharData object with the given character to the beginning of this list. */
     public void addFirst(char chr) {
         // Your code goes here
-        CharData newCharData = new CharData(chr);
-        Node newNode = new Node(newCharData, first);
-        this.first = newNode;
+        CharData newData = new CharData(chr);
+        Node newNode = new Node(newData, first);
+        first = newNode;
         size++;
     }
     
